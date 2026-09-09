@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小小科學家探究助手：空氣的秘密</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap');
+    body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f9ff; }
+    .chat-bubble { max-width: 85%; animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-2 sm:p-4">
+
+  <!-- 頂部標題列 -->
+  <header class="w-full max-w-md bg-yellow-400 rounded-2xl p-4 text-center shadow-md mb-3 flex items-center justify-between">
+    <div class="flex items-center space-x-2">
+      <span class="text-3xl">🔬</span>
+      <h1 class="text-xl font-bold text-blue-900">科學探究助手</h1>
+    </div>
+    <button onclick="resetChat()" class="text-xs bg-white text-blue-800 px-3 py-1.5 rounded-full font-bold shadow hover:bg-yellow-100">重新開始</button>
+  </header>
+
+  <!-- 對話區域 -->
+  <main id="chat-box" class="w-full max-w-md bg-white rounded-2xl shadow-lg p-4 flex-1 overflow-y-auto mb-3 space-y-3 min-h-[380px] max-h-[60vh]">
+    <!-- 對話內容由 JavaScript 動態生成 -->
+  </main>
+
+  <!-- 輸入與快捷按鈕區域 -->
+  <footer class="w-full max-w-md bg-white rounded-2xl shadow-lg p-3 space-y-2">
+    <div id="quick-options" class="flex flex-wrap gap-2 justify-center min-h-[36px]">
+      <!-- 動態快捷選項 -->
+    </div>
+    <div class="flex gap-2">
+      <input type="text" id="user-input" placeholder="輸入或選擇答案..." class="flex-1 border-2 border-yellow-400 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-yellow-500">
+      <button onclick="handleSend()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 py-2 rounded-xl text-base shadow">傳送</button>
+      <button onclick="getHint()" class="bg-amber-400 hover:bg-amber-500 text-blue-900 font-bold px-3 py-2 rounded-xl text-sm shadow">💡提示</button>
+    </div>
+  </footer>
+
+  <script>
+    // 探究關卡數據（Strictly follows Rules 1-10）
+    const steps = [
+      {
+        id: 1,
+        type: 'observe',
+        question: "你好！將杯子垂直壓入水中再取出，你**觀察到**杯底的紙巾有甚麼變化？",
+        hint: "提示：用手指摸摸杯底的紙巾，它是濕的還是乾的呢？",
+        options: ["紙巾是乾的", "紙巾濕透了", "不知道"],
+        check: (input) => input.includes("乾") && !input.includes("濕"),
+        wrongResp: "再仔細摸摸看！記得杯子要垂直放入水中，不要傾斜喔。紙巾摸起來怎樣？"
+      },
+      {
+        id: 2,
+        type: 'evidence',
+        question: "太棒了！紙巾是乾的。那你有甚麼**證據**證明剛才水有沒有進去杯子底部？",
+        hint: "提示：如果水有進去，紙巾會怎樣？現在紙巾又是怎樣的？",
+        options: ["水沒有進去，因為紙巾沒濕", "水充滿了杯子", "沒有證據"],
+        check: (input) => input.includes("沒濕") || input.includes("沒有進") || input.includes("沒進") || input.includes("乾"),
+        wrongResp: "想想看，如果水剛才跑進杯底，紙巾還會是乾的嗎？"
+      },
+      {
+        id: 3,
+        type: 'observe',
+        question: "觀察得好！現在把杯子在水中稍微「傾斜」一下，你**觀察到**甚麼跑出來了？",
+        hint: "提示：看看水中有沒有一朵朵圓圓的、向上升的東西？",
+        options: ["有氣泡跑出來", "甚麼也沒有", "水變顏色了"],
+        check: (input) => input.includes("氣泡") || input.includes("泡泡") || input.includes("空氣"),
+        wrongResp: "再看清楚一點，杯子傾斜時，水面是不是有冒出咕嚕咕嚕的圓泡泡？"
+      },
+      {
+        id: 4,
+        type: 'evidence',
+        question: "對了！有氣泡冒出來。氣泡跑出來後，你看到水有沒有進去杯子裡？**證據**是甚麼？",
+        hint: "提示：看看傾斜後，杯子裡的水位和紙巾有甚麼變化？",
+        options: ["水進去了，紙巾變濕了", "水還是進不去", "紙巾還是乾的"],
+        check: (input) => input.includes("進去") || input.includes("濕") || input.includes("水進"),
+        wrongResp: "氣泡跑出來後，再摸摸紙巾，現在紙巾有沒有變濕呢？"
+      },
+      {
+        id: 5,
+        type: 'explain',
+        question: "非常出色！**為甚麼**剛才氣泡跑出來後，水才能進去呢？杯子裡原本藏著甚麼？",
+        hint: "提示：那些冒出來的氣泡，其實就是藏在杯子裡的什麼？",
+        options: ["藏著空氣，它佔了位置", "杯子裡甚麼也沒有", "因為水太重了"],
+        check: (input) => input.includes("空氣") || input.includes("空間") || input.includes("位置"),
+        wrongResp: "想想看，那些跑出來的氣泡就是甚麼？它剛才是不是擋住了水？"
+      }
+    ];
+
+    let currentStep = 0;
+
+    function init() {
+      document.getElementById('chat-box').innerHTML = '';
+      currentStep = 0;
+      addBotMessage(steps[0].question);
+      updateOptions(steps[0].options);
+    }
+
+    function addBotMessage(text) {
+      const box = document.getElementById('chat-box');
+      const msg = document.createElement('div');
+      msg.className = 'flex items-start space-x-2 chat-bubble';
+      msg.innerHTML = `
+        <span class="text-2xl">🤖</span>
+        <div class="bg-blue-100 text-blue-900 rounded-2xl p-3 text-base shadow-sm">
+          ${text}
+          <button onclick="speak('${text.replace(/[*_]/g, '')}')" class="ml-2 text-xs bg-blue-200 hover:bg-blue-300 rounded-full px-2 py-0.5">🔊 聽聲音</button>
+        </div>
+      `;
+      box.appendChild(msg);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function addUserMessage(text) {
+      const box = document.getElementById('chat-box');
+      const msg = document.createElement('div');
+      msg.className = 'flex items-end justify-end space-x-2 chat-bubble ml-auto';
+      msg.innerHTML = `
+        <div class="bg-yellow-400 text-blue-950 rounded-2xl p-3 text-base font-bold shadow-sm">
+          ${text}
+        </div>
+        <span class="text-2xl">👦</span>
+      `;
+      box.appendChild(msg);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function updateOptions(options) {
+      const optDiv = document.getElementById('quick-options');
+      optDiv.innerHTML = '';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'bg-gray-100 hover:bg-yellow-200 text-gray-800 text-xs px-3 py-1.5 rounded-full border border-gray-300 transition';
+        btn.innerText = opt;
+        btn.onclick = () => {
+          document.getElementById('user-input').value = opt;
+          handleSend();
+        };
+        optDiv.appendChild(btn);
+      });
+    }
+
+    function handleSend() {
+      const inputEl = document.getElementById('user-input');
+      const val = inputEl.value.trim();
+      if (!val) return;
+
+      addUserMessage(val);
+      inputEl.value = '';
+
+      setTimeout(() => {
+        const step = steps[currentStep];
+        if (step.check(val)) {
+          currentStep++;
+          if (currentStep < steps.length) {
+            addBotMessage(steps[currentStep].question);
+            updateOptions(steps[currentStep].options);
+          } else {
+            // 最終目標結論
+            const finalMsg = "太棒了！你太聰明了！我們得出結論囉：**空氣雖然看不見，但它佔有空間。** 🎉";
+            addBotMessage(finalMsg);
+            updateOptions(["我學會了！", "再玩一次"]);
+          }
+        } else {
+          addBotMessage(step.wrongResp);
+        }
+      }, 500);
+    }
+
+    function getHint() {
+      if (currentStep < steps.length) {
+        addBotMessage(steps[currentStep].hint);
+      }
+    }
+
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'zh-HK';
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function resetChat() {
+      init();
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
