@@ -11,6 +11,19 @@
   var progressText = document.getElementById("progress-text");
   var progressDots = document.getElementById("progress-dots");
   var app = document.getElementById("app");
+  var stage = document.getElementById("stage");
+  var stageKicker = document.getElementById("stage-kicker");
+  var stageCaption = document.getElementById("stage-caption");
+  var tankBadge = document.getElementById("tank-badge");
+
+  var SCENES = [
+    { scene: "push", badge: "垂直壓入", caption: "杯口朝下，垂直壓入水中，紙巾還是乾的。" },
+    { scene: "dry", badge: "紙巾是乾的", caption: "紙巾沒有濕，證明水沒有進到杯底。" },
+    { scene: "bubbles", badge: "氣泡跑出", caption: "杯子一傾斜，空氣就變成氣泡跑出來。" },
+    { scene: "wet", badge: "紙巾變濕", caption: "氣泡走了，水進到杯裡，紙巾變濕。" },
+    { scene: "air", badge: "空氣佔住位置", caption: "杯裡的空氣佔住位置，所以水剛才進不去。" },
+    { scene: "air", badge: "說出結論", caption: "看著杯裡的空氣，用一句話講出它的特性。" }
+  ];
 
   var stepIndex = 0;
   var phase = "ask";
@@ -154,6 +167,23 @@
       var current = G.steps[stepIndex];
       progressText.textContent = "第 " + (stepIndex + 1) + " 步，共 " + G.steps.length + " 步：" + current.typeLabel;
     }
+    renderStage();
+  }
+
+  function renderStage() {
+    if (phase === "done") {
+      stage.setAttribute("data-scene", "conclude");
+      stageKicker.textContent = "探究完成";
+      stageCaption.textContent = "結論：空氣雖然看不見，但佔有空間。";
+      tankBadge.textContent = "空氣佔有空間";
+      return;
+    }
+    var scene = SCENES[stepIndex];
+    var step = G.steps[stepIndex];
+    stage.setAttribute("data-scene", scene.scene);
+    stageKicker.textContent = "第 " + (stepIndex + 1) + " 步 · " + step.typeLabel;
+    stageCaption.textContent = scene.caption;
+    tankBadge.textContent = scene.badge;
   }
 
   function setOptions(list, onPick) {

@@ -7,7 +7,7 @@
   <title>小小科學家探究助手：空氣的秘密</title>
   <meta name="description" content="小學五年級科學探究對話：杯子與紙巾實驗，認識空氣佔有空間。">
   <link rel="icon" href="favicon.svg">
-  <link rel="stylesheet" href="css/style.css?v=1">
+  <link rel="stylesheet" href="css/style.css?v=2">
 </head>
 <body>
   <a class="skip" href="#user-input">跳到輸入答案</a>
@@ -21,12 +21,44 @@
       <button type="button" id="reset" class="reset">重新開始</button>
     </header>
 
+    <div class="workspace">
+    <section id="stage" class="stage" data-scene="push" aria-labelledby="stage-caption">
+      <div class="stage-view">
+        <div class="lab" aria-hidden="true">
+          <div class="tank">
+            <div class="water"></div>
+            <div class="wave"></div>
+            <p class="tank-badge" id="tank-badge">垂直壓入</p>
+            <span class="water-name">水</span>
+            <div class="bubbles"><span></span><span></span><span></span></div>
+            <div class="cup-rig">
+              <div class="nudge"></div>
+              <div class="cup-spin">
+                <div class="glass">
+                  <div class="cup-inner">
+                    <div class="inner-water"></div>
+                    <div class="shine"></div>
+                    <div class="towel"><span>紙巾</span></div>
+                    <div class="air-word">空氣</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="table"></div>
+        </div>
+      </div>
+      <div class="stage-copy">
+        <p id="stage-kicker" class="stage-kicker">第 1 步 · 觀察</p>
+        <p id="stage-caption" class="stage-caption" aria-live="polite">杯口朝下，垂直壓入水中，紙巾還是乾的。</p>
+      </div>
+    </section>
+
+    <div class="dialogue">
     <section class="progress" aria-label="探究進度">
       <ol id="progress-dots"></ol>
       <p id="progress-text">第 1 步，共 6 步：觀察</p>
     </section>
-
-    <p class="setup">杯底塞好紙巾，杯口朝下，垂直壓入水中。傾斜杯子時，再看水裡有甚麼跑出來。</p>
 
     <main id="chat" class="chat" role="log" aria-live="polite" aria-relevant="additions" aria-label="探究對話"></main>
 
@@ -40,9 +72,11 @@
       </div>
       <p id="form-status" class="status" role="status"></p>
     </form>
+    </div>
+    </div>
   </div>
   <noscript><p class="setup">請開啟 JavaScript，探究助手才可以對話。</p></noscript>
-  <script src="js/grade.js?v=1"></script>
-  <script src="js/app.js?v=1"></script>
+  <script src="js/grade.js?v=2"></script>
+  <script src="js/app.js?v=2"></script>
 </body>
 </html>
